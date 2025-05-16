@@ -3,162 +3,427 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dolandırıcılık ve Davranış Uyarısı</title>
+    <title>Fotoğraf Paylaşım</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #00ff00;
+            --background-color: #000000;
+            --card-color: #111111;
+            --text-color: #ffffff;
+            --border-color: #333333;
+            --shadow-color: rgba(0, 255, 0, 0.1);
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
+            font-family: 'Roboto', sans-serif;
             margin: 0;
-            padding: 20px;
-            color: #333;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
         }
-        
-        .warning-container {
-            max-width: 900px;
-            margin: 0 auto;
-            background-color: #fff;
+
+        .admin-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: #000;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            z-index: 1000;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .admin-login {
+            display: none;
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background-color: var(--card-color);
+            border: 1px solid var(--primary-color);
             border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+            padding: 20px;
+            width: 300px;
+            z-index: 1000;
         }
-        
-        .warning-header {
-            background-color: #dc3545;
+
+        .admin-input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid var(--primary-color);
+            border-radius: 5px;
+            background-color: #222;
             color: white;
-            padding: 15px 20px;
-            text-align: center;
-            font-size: 24px;
+        }
+
+        .admin-submit {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--primary-color);
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
             font-weight: bold;
         }
-        
-        .warning-content {
-            display: flex;
-            flex-direction: column;
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
             padding: 20px;
+            margin-top: 60px;
         }
-        
-        @media (min-width: 768px) {
-            .warning-content {
-                flex-direction: row;
-            }
-        }
-        
-        .warning-text {
-            flex: 1;
-            padding: 10px;
-        }
-        
-        .warning-images {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            padding: 10px;
-        }
-        
-        .warning-image {
-            width: 100%;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+        .photo-card {
+            background-color: var(--card-color);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
             transition: transform 0.3s;
         }
-        
-        .warning-image:hover {
-            transform: scale(1.02);
+
+        .photo-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
         }
-        
-        .warning-footer {
-            text-align: center;
+
+        .photo-info {
             padding: 15px;
-            background-color: #f1f1f1;
+        }
+
+        .photo-title {
+            font-weight: bold;
+            margin: 0 0 5px 0;
+            color: var(--primary-color);
+        }
+
+        .photo-desc {
             font-size: 14px;
-            color: #666;
+            color: #aaa;
+            margin: 0;
         }
-        
-        .szofren {
+
+        .empty-message {
+            text-align: center;
+            grid-column: 1 / -1;
+            color: var(--primary-color);
+            padding: 50px 0;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            z-index: 999;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .admin-content {
+            background-color: var(--card-color);
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .close-admin {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .theme-options {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .theme-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .theme-option.selected {
+            border-color: white;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--primary-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--primary-color);
+            border-radius: 5px;
+            background-color: #222;
+            color: white;
+        }
+
+        .post-btn {
+            background-color: var(--primary-color);
+            color: black;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
             font-weight: bold;
-            color: #dc3545;
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-        
-        .highlight {
-            font-weight: bold;
-            color: #dc3545;
-        }
-        
-        .second-note {
-            margin-top: 30px;
-            padding: 15px;
-            background-color: #fff8e1;
-            border-left: 4px solid #ffc107;
-            border-radius: 0 8px 8px 0;
-        }
-        
-        .second-note-title {
-            font-weight: bold;
-            color: #ff9800;
-            font-size: 18px;
-            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="warning-container">
-        <div class="warning-header">
-            DİKKAT! DOLANDIRICILIK VE DAVRANIŞ UYARISI
-        </div>
-        <div class="warning-content">
-            <div class="warning-text">
-                <div class="szofren">S İ Z O F R E N</div>
-                <p>Selam arkadaşlar, bu paylaşımı yapma sebebim sizleri olası bir dolandırıcılığa karşı uyarmak. <span class="highlight">@uvworx</span> kullanıcı adına sahip şahıs, sosyal medya hikayelerinde sahte hesap ekran görüntüleri paylaşarak güven kazanıyor ve ardından çeşitli bahanelerle insanlardan para talep ediyor. Parayı aldıktan sonra ise kişileri engelliyor ve iletişim kurmayı imkansız hale getiriyor.</p>
-                
-                <p>Bu şahıs, masum insanların iyi niyetini suistimal ederek maddi kazanç sağlamaya çalışıyor. Sizden ricam, bu tür kişilere kesinlikle güvenmeyin ve çevrenizi de bu konuda bilinçlendirin. Eğer siz de benzer bir durumla karşılaştıysanız, mutlaka ilgili platforma şikayet edin ve gerekirse hukuki yollara başvurun.</p>
-                
-                <p>Lütfen bu tarz dolandırıcılara prim vermeyin, paylaşarak daha fazla kişinin zarar görmesini engelleyin!</p>
-                
-                <div class="second-note">
-                    <div class="second-note-title">Dikkat! Davranış ve Güvenlik Uyarısı</div>
-                    <p>Herkese selam. Bu paylaşımı sizleri bilgilendirmek ve bazı hassas durumlara dikkat çekmek için yapıyorum. <span class="highlight">@Swozzlandin</span> adlı şahıs, +18 yaş sınırının altında olmasına rağmen sosyal platformlarda uygunsuz davranışlar sergilemiş, ayrıca geçmişte Şizofren ve Almanist kullanıcılarından özür dilemek zorunda kalmıştır.</p>
-                    
-                    <p>Bu kişi, sosyal medyada insanlara saygısızca yaklaşmakta, şahsi değerlere ve sınırlarına hakaret içeren ifadelerle yaklaşmaktadır. Toplum kurallarını ve birey haklarını hiçe sayan bu tarz davranışlara karşı dikkatli olunması gerekmektedir.</p>
-                    
-                    <p>Lütfen çevrenizi bilinçlendirin, bu tür kişilere prim vermeyin ve benzer davranışlarla karşılaştığınızda ilgili platformlara gerekli şikayetleri yapmaktan çekinmeyin. Güvenli bir dijital ortam hepimizin sorumluluğudur.</p>
+    <button class="admin-btn" id="adminBtn">ADMIN</button>
+
+    <div class="admin-login" id="adminLogin">
+        <h3>ADMIN GIRISI</h3>
+        <input type="text" class="admin-input" id="adminUsername" placeholder="Kullanıcı Adı">
+        <input type="password" class="admin-input" id="adminPassword" placeholder="Şifre">
+        <button class="admin-submit" id="adminSubmit">GIRIS YAP</button>
+    </div>
+
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-content">
+            <button class="close-admin" id="closeAdmin">×</button>
+            <h2 style="color: var(--primary-color); margin-top: 0;">ADMIN PANELI</h2>
+            
+            <div>
+                <h3>TEMA AYARLARI</h3>
+                <div class="theme-options">
+                    <div class="theme-option selected" style="background-color: #00ff00;" data-color="#00ff00"></div>
+                    <div class="theme-option" style="background-color: #ff0000;" data-color="#ff0000"></div>
+                    <div class="theme-option" style="background-color: #0000ff;" data-color="#0000ff"></div>
+                    <div class="theme-option" style="background-color: #ffff00;" data-color="#ffff00"></div>
+                    <div class="theme-option" style="background-color: #ff00ff;" data-color="#ff00ff"></div>
                 </div>
-                
-                <p><strong>By: @n4rk0t1ks | @alm4nh4x</strong></p>
             </div>
-            <div class="warning-images">
-                <img src="https://scontent-muc2-1.xx.fbcdn.net/v/t1.15752-9/495073886_727343123427353_5448503319085736973_n.jpg?stp=dst-jpg_p480x480_tt6&_nc_cat=111&ccb=1-7&_nc_sid=0024fc&_nc_ohc=pip5iWjxlYAQ7kNvwGJO605&_nc_oc=Adk_qrP4-Kropjijz0NfGgPQ3JUAUxaS-nf01oQi5Fq6Gf3XUzOTY5wAahlteNNWWfEx0qxa8feWGz8JA4rJjTsR&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-muc2-1.xx&oh=03_Q7cD2QH5gb89TZCmbRCDOLrjuvbPezDYx7WmTfh8RYeYSjvlmg&oe=6845C74A" alt="Dolandırıcılık kanıtı 1" class="warning-image">
-                <img src="https://scontent-muc2-1.xx.fbcdn.net/v/t1.15752-9/494831873_2110381799479799_1909060378525847844_n.jpg?stp=dst-jpg_p480x480_tt6&_nc_cat=106&ccb=1-7&_nc_sid=0024fc&_nc_ohc=Q2v8yo7kqzsQ7kNvwGAN7af&_nc_oc=AdlmNo07OKeeVFEClhIM8ipwuBfqgfzTmgUmbZ5EBRVrh4JUpvj3j1cKM_abWMg7i8dpOo3IHoGDrxO0hvyqFaXd&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-muc2-1.xx&oh=03_Q7cD2QG9Tzpav1scxHYeo15a3c8RyYlvDoIRZiwkwyuXhud0uA&oe=6845DBFA" alt="Dolandırıcılık kanıtı 2" class="warning-image">
-                <img src="https://scontent-muc2-1.xx.fbcdn.net/v/t1.15752-9/494830083_1020962566855122_2920921498766547528_n.jpg?stp=dst-jpg_s526x395_tt6&_nc_cat=109&ccb=1-7&_nc_sid=0024fc&_nc_ohc=wOTiJ3R2VGAQ7kNvwHkY5a1&_nc_oc=AdnSCpv-5ShZaYxsRbZ7yOQxyk90mob8Q3IXfx-XVC-kHhmjGEDOzq_sydGoiDW97os-zcNBTCyaEaa240u17FQb&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent-muc2-1.xx&oh=03_Q7cD2QFQrugc0N-Ad_rJLlfIeBLa0EbzEuxGctvJa6TsLHQ2cw&oe=6849BFE2" alt="Davranış uyarısı kanıtı" class="warning-image">
+
+            <div class="new-post-form" style="margin-top: 30px;">
+                <h3>YENI FOTOGRAF EKLE</h3>
+                <div class="form-group">
+                    <label for="postTitle">BASLIK</label>
+                    <input type="text" class="form-control" id="postTitle">
+                </div>
+                <div class="form-group">
+                    <label for="postDesc">ACIKLAMA</label>
+                    <input type="text" class="form-control" id="postDesc">
+                </div>
+                <div class="form-group">
+                    <label for="postImage">FOTOGRAF</label>
+                    <input type="file" class="form-control" id="postImage" accept="image/*">
+                </div>
+                <button class="post-btn" id="addPostBtn">PAYLAS</button>
             </div>
-        </div>
-        <div class="warning-footer">
-            Bu uyarıyı paylaşarak başkalarının dolandırılmasını ve kötü davranışlara maruz kalmasını önleyebilirsiniz.
         </div>
     </div>
 
-    <script>
-        // Sayfa yüklendiğinde bir uyarı gösterelim
-        window.onload = function() {
-            alert('DİKKAT! Bu bir dolandırıcılık ve davranış uyarısıdır. Lütfen içeriği dikkatlice okuyunuz.');
+    <div class="photo-grid" id="photoGrid">
+        <div class="empty-message">Henüz hiç fotoğraf paylaşılmadı</div>
+    </div>
+
+    <script type="module">
+        // Firebase modülleri
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-storage.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.7.3/firebase-analytics.js";
+
+        // Firebase konfigürasyonu
+        const firebaseConfig = {
+            apiKey: "AIzaSyBGOq1U5kJ8Y0X5q-qWg973koCGBedduYg",
+            authDomain: "aeqw-712b3.firebaseapp.com",
+            projectId: "aeqw-712b3",
+            storageBucket: "aeqw-712b3.appspot.com",
+            messagingSenderId: "958308883027",
+            appId: "1:958308883027:web:8b50f5c07ab1fdf7f944a6",
+            measurementId: "G-6TGHH6HKVZ"
+        };
+
+        // Firebase'i başlat
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        const analytics = getAnalytics(app);
+
+        // DOM elementleri
+        const adminBtn = document.getElementById('adminBtn');
+        const adminLogin = document.getElementById('adminLogin');
+        const adminSubmit = document.getElementById('adminSubmit');
+        const adminPanel = document.getElementById('adminPanel');
+        const closeAdmin = document.getElementById('closeAdmin');
+        const addPostBtn = document.getElementById('addPostBtn');
+        const photoGrid = document.getElementById('photoGrid');
+        const themeOptions = document.querySelectorAll('.theme-option');
+
+        // Tema ve postları yükle
+        loadTheme();
+        loadPosts();
+
+        // Admin butonu
+        adminBtn.addEventListener('click', () => {
+            adminLogin.style.display = adminLogin.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Admin girişi
+        adminSubmit.addEventListener('click', async () => {
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
             
-            // Görsellere tıklanınca büyütme efekti ekleyelim
-            const images = document.querySelectorAll('.warning-image');
-            images.forEach(img => {
-                img.addEventListener('click', function() {
-                    if (this.style.transform === 'scale(1.5)') {
-                        this.style.transform = 'scale(1)';
-                        this.style.zIndex = '0';
-                    } else {
-                        this.style.transform = 'scale(1.5)';
-                        this.style.zIndex = '10';
-                        this.style.position = 'relative';
-                    }
+            try {
+                await signInWithEmailAndPassword(auth, `${username}@admin.com`, password);
+                adminLogin.style.display = 'none';
+                adminPanel.style.display = 'block';
+            } catch (error) {
+                alert('Hatalı giriş: ' + error.message);
+            }
+        });
+
+        // Admin panelini kapat
+        closeAdmin.addEventListener('click', () => {
+            signOut(auth);
+            adminPanel.style.display = 'none';
+        });
+
+        // Tema değiştirme
+        themeOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const color = option.getAttribute('data-color');
+                changeThemeColor(color);
+                saveTheme(color);
+            });
+        });
+
+        // Yeni post ekleme
+        addPostBtn.addEventListener('click', async () => {
+            const title = document.getElementById('postTitle').value;
+            const desc = document.getElementById('postDesc').value;
+            const imageFile = document.getElementById('postImage').files[0];
+            
+            if (!title || !imageFile) {
+                alert('Lütfen başlık ve fotoğraf seçin!');
+                return;
+            }
+            
+            try {
+                // Resmi storage'a yükle
+                const storageRef = ref(storage, `images/${Date.now()}_${imageFile.name}`);
+                const snapshot = await uploadBytes(storageRef, imageFile);
+                const url = await getDownloadURL(snapshot.ref);
+                
+                // Firestore'a kaydet
+                await addDoc(collection(db, 'posts'), {
+                    title: title,
+                    description: desc,
+                    imageUrl: url,
+                    timestamp: serverTimestamp()
+                });
+                
+                // Formu temizle
+                document.getElementById('postTitle').value = '';
+                document.getElementById('postDesc').value = '';
+                document.getElementById('postImage').value = '';
+            } catch (error) {
+                alert('Hata oluştu: ' + error.message);
+            }
+        });
+
+        // Postları yükle
+        function loadPosts() {
+            onSnapshot(collection(db, 'posts'), (snapshot) => {
+                photoGrid.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    photoGrid.innerHTML = '<div class="empty-message">Henüz hiç fotoğraf paylaşılmadı</div>';
+                    return;
+                }
+                
+                snapshot.forEach(doc => {
+                    const post = doc.data();
+                    const photoCard = document.createElement('div');
+                    photoCard.className = 'photo-card';
+                    photoCard.innerHTML = `
+                        <img src="${post.imageUrl}" class="photo-img" loading="lazy">
+                        <div class="photo-info">
+                            <div class="photo-title">${post.title}</div>
+                            <div class="photo-desc">${post.description || ''}</div>
+                        </div>
+                    `;
+                    photoGrid.appendChild(photoCard);
                 });
             });
-        };
+        }
+
+        // Tema rengini değiştir
+        function changeThemeColor(color) {
+            document.documentElement.style.setProperty('--primary-color', color);
+            document.documentElement.style.setProperty('--shadow-color', `rgba(${parseInt(color.substr(1,2), 16)}, ${parseInt(color.substr(3,2), 16)}, ${parseInt(color.substr(5,2), 16)}, 0.1)`);
+            
+            themeOptions.forEach(opt => opt.classList.remove('selected'));
+            document.querySelector(`.theme-option[data-color="${color}"]`).classList.add('selected');
+        }
+
+        // Tema rengini kaydet
+        async function saveTheme(color) {
+            if (auth.currentUser) {
+                try {
+                    await setDoc(doc(db, 'settings', 'theme'), {
+                        color: color
+                    });
+                } catch (error) {
+                    console.error('Tema kaydedilirken hata:', error);
+                }
+            }
+        }
+
+        // Tema rengini yükle
+        function loadTheme() {
+            onSnapshot(doc(db, 'settings', 'theme'), (doc) => {
+                if (doc.exists()) {
+                    changeThemeColor(doc.data().color || '#00ff00');
+                }
+            });
+        }
+
+        // Auth state kontrolü
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                adminBtn.style.display = 'block';
+            } else {
+                adminBtn.style.display = 'block';
+                adminPanel.style.display = 'none';
+                adminLogin.style.display = 'none';
+            }
+        });
     </script>
 </body>
 </html>
